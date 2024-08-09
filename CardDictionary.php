@@ -539,10 +539,10 @@ function MemoryCost($cardID, $player)
   return $cost;
 }
 
-function AbilityCost($cardID, $index=-1, $theirCard = false)
+function AbilityCost($cardID, $index=-1)
 {
   global $currentPlayer;
-  $abilityName = $theirCard ? GetOpponentControlledAbilityNames($cardID) : GetResolvedAbilityName($cardID);
+  $abilityName = GetResolvedAbilityName($cardID);
   if($abilityName == "Heroic Resolve") return 2;
   switch($cardID) {
     case "2579145458"://Luke Skywalker
@@ -569,8 +569,6 @@ function AbilityCost($cardID, $index=-1, $theirCard = false)
       return $abilityName == "Ambush" ? 1 : 0;
     case "8709191884"://Hunter (Outcast Sergeant)
       return $abilityName == "Replace Resource" ? 1 : 0;
-    case "3577961001"://Mercenary Gunship
-      return $abilityName == "Take Control" ? 4 : 0;
     default: break;
   }
   if(IsAlly($cardID)) return 0;
@@ -641,16 +639,6 @@ function GetAbilityType($cardID, $index = -1, $from="-")
       return $char[CharacterPieces() + 2] == 0 ? "A" : "";
     default: return "";
   }
-}
-
-function GetOpponentAbilityTypes($cardID, $index = -1, $from="-") {
-  $abilityTypes = "";
-  switch($cardID) {
-    case "3577961001": {
-      $abilityTypes = "A";
-    }
-  }
-  return $abilityTypes;
 }
 
 function GetAbilityTypes($cardID, $index = -1, $from="-")
@@ -979,20 +967,7 @@ function GetAbilityNames($cardID, $index = -1, $validate=false)
   return $abilityNames;
 }
 
-function GetOpponentControlledAbilityNames($cardID) {
-  $abilityNames = "";
-
-  switch($cardID) {
-    case "3577961001":
-      $abilityNames = "Take Control";
-      break;
-    default: break;
-  }
-
-  return $abilityNames;
-}
-
-function GetAbilityIndex($cardID, $index, $abilityName, $theirCard = false)
+function GetAbilityIndex($cardID, $index, $abilityName)
 {
   $abilityName = str_replace("_", " ", $abilityName);
   $names = explode(",", GetAbilityNames($cardID, $index));
@@ -1002,7 +977,7 @@ function GetAbilityIndex($cardID, $index, $abilityName, $theirCard = false)
   return 0;
 }
 
-function GetResolvedAbilityType($cardID, $from="-", $theirCard = false)
+function GetResolvedAbilityType($cardID, $from="-")
 {
   global $currentPlayer, $CS_AbilityIndex, $CS_PlayIndex;
   if($from == "HAND") return "";
@@ -1010,7 +985,7 @@ function GetResolvedAbilityType($cardID, $from="-", $theirCard = false)
   $abilityTypes = GetAbilityTypes($cardID, GetClassState($currentPlayer, $CS_PlayIndex));
   if($abilityTypes == "" || $abilityIndex == "-") return GetAbilityType($cardID, -1, $from);
   $abilityTypes = explode(",", $abilityTypes);
-  return $theirCard ? "A" : $abilityTypes[$abilityIndex]; //This will need to be updated if there are ever non-action abilities that can be activated on opponent's cards.
+  return $abilityTypes[$abilityIndex];
 }
 
 function GetResolvedAbilityName($cardID, $from="-")
@@ -1176,11 +1151,11 @@ function IsAction($cardID)
   return false;
 }
 
-function GoesOnCombatChain($phase, $cardID, $from, $theirCard = false)
+function GoesOnCombatChain($phase, $cardID, $from)
 {
   global $layers;
-  if($theirCard) return false;
-  if($phase != "B" && $from == "EQUIP" || $from == "PLAY") $cardType = GetResolvedAbilityType($cardID, $from, $theirCard);
+  if($phase != "B" && $from == "EQUIP" || $from == "PLAY") $cardType = GetResolvedAbilityType($cardID, $from);
+  else if($phase == "M" && $cardID == "MON192" && $from == "BANISH") $cardType = GetResolvedAbilityType($cardID, $from);
   else $cardType = CardType($cardID);
   if($cardType == "I") return false; //Instants as yet never go on the combat chain
   if($phase == "B" && count($layers) == 0) return true; //Anything you play during these combat phases would go on the chain

@@ -258,14 +258,6 @@ function AllyPlayableExhausted($cardID) {
   }
 }
 
-function TheirAllyPlayableExhausted($cardID) {
-  switch($cardID) {
-    case "3577961001"://Mercenary Gunship
-      return true;
-    default: return false;
-  }
-}
-
 function AllyDoesAbilityExhaust($cardID, $abilityIndex) {
   switch($cardID) {
     case "4300219753"://Fett's Firespray
@@ -280,14 +272,6 @@ function AllyDoesAbilityExhaust($cardID, $abilityIndex) {
       return $abilityIndex == 1;
     case "a742dea1f1"://Han Solo Red Unit
       return $abilityIndex == 1;
-    default: return true;
-  }
-}
-
-function TheirAllyDoesAbilityExhaust($cardID, $abilityIndex) {
-  switch($cardID) {
-    case "3577961001"://Mercenary Gunship
-      return false;
     default: return true;
   }
 }

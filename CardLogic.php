@@ -369,9 +369,8 @@ function IsGamePhase($phase)
 function ContinueDecisionQueue($lastResult = "")
 {
   global $decisionQueue, $turn, $currentPlayer, $mainPlayerGamestateStillBuilt, $makeCheckpoint, $otherPlayer;
-  global $layers, $layerPriority, $dqVars, $dqState, $CS_PlayIndex, $CS_AdditionalCosts, $mainPlayer, $CS_LayerPlayIndex, $CS_OppCardActive;
+  global $layers, $layerPriority, $dqVars, $dqState, $CS_PlayIndex, $CS_AdditionalCosts, $mainPlayer, $CS_LayerPlayIndex;
   global $CS_ResolvingLayerUniqueID;
-
   if(count($decisionQueue) == 0 || IsGamePhase($decisionQueue[0])) {
     if($mainPlayerGamestateStillBuilt) UpdateMainPlayerGameState();
     else if(count($decisionQueue) > 0 && $currentPlayer != $decisionQueue[1]) {
@@ -443,8 +442,6 @@ function ContinueDecisionQueue($lastResult = "")
               ProcessDecisionQueue();
             }
             else {
-              $oppCardActive = GetClassState($currentPlayer, $CS_OppCardActive) >= 0;
-
               $cardID = $parameter;
               $subparamArr = explode("!", $target);
               $from = $subparamArr[0];
@@ -455,7 +452,7 @@ function ContinueDecisionQueue($lastResult = "")
               $playIndex = count($subparamArr) > 5 ? $subparamArr[5] : -1;
                 SetClassState($player, $CS_AbilityIndex, $abilityIndex);
                 SetClassState($player, $CS_PlayIndex, $playIndex);
-                $playText = PlayAbility($cardID, $from, $resourcesPaid, $target, $additionalCosts, $oppCardActive);
+                $playText = PlayAbility($cardID, $from, $resourcesPaid, $target, $additionalCosts);
                 if($from != "PLAY") WriteLog("Resolving play ability of " . CardLink($cardID, $cardID) . ($playText != "" ? ": " : ".") . $playText);
                 if($from == "EQUIP") {
                   EquipPayAdditionalCosts(FindCharacterIndex($player, $cardID), "EQUIP");
