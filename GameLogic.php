@@ -314,6 +314,7 @@ function DecisionQueueStaticEffect($phase, $player, $parameter, $lastResult)
       return $lastResult;
     case "ADDMZUSES":
       $lrArr = explode("-", $lastResult);
+      WriteLog("Modifying uses");
       switch($lrArr[0]) {
         case "MYCHAR": case "THEIRCHAR": AddCharacterUses($player, $lrArr[1], $parameter); break;
         case "MYALLY": case "THEIRALLY":
@@ -1066,8 +1067,12 @@ function DecisionQueueStaticEffect($phase, $player, $parameter, $lastResult)
       $bounty = $paramArr[0];
       $bountyUnit = $paramArr[1];
       $skipBossk = false;
-      CollectBounty($player, -1, $bounty, skipBossk:true, bountyUnitOverride:$bountyUnit);
-      return $lastResult;
+      // CollectBounty($player, -1, $bounty, skipBossk:true, bountyUnitOverride:$bountyUnit);
+      // WriteLog("Attempt to Layer -> " . $bounty);
+      // AddLayer("TRIGGER", $player, $bounty, $bountyUnit, true);
+      WriteLog("Using Bossk");
+      handleBountyTriggers($player, $bounty, $bountyUnit, true);
+      return 1;
     case "ARCANECHOSEN":
       if($lastResult > 0) {
         if(SearchCharacterActive($player, "UPR166")) {

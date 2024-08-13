@@ -615,182 +615,9 @@ function ProcessTrigger($player, $parameter, $uniqueID, $additionalCosts, $targe
       $uniqueID = $arr[1];
       AllyPlayCardAbility($target, $player, from: $additionalCosts, abilityID:$abilityID, uniqueID:$uniqueID);
       break;
-    //Begin Bounties Section
-    case "1090660242-2"://The Client
-      Restore(5, $player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
+    case "BOSSKBOUNTY":
+      handleBountyTriggers($player, $parameter, $uniqueID, $additionalCosts, $target, true);
       break;
-    case "0622803599-2"://Jabba the Hutt
-      AddCurrentTurnEffect("0622803599-3", $player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "f928681d36-2"://Jabba the Hutt Leader Unit
-      AddCurrentTurnEffect("f928681d36-3", $player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "2178538979"://Price on Your Head
-      AddTopDeckAsResource($player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "2740761445"://Guild Target
-      $opponent = $player == 1 ? 2 : 1;
-      $damage = CardIsUnique($target) ? 3 : 2;
-      DealDamageAsync($opponent, $damage, "DAMAGE", "2740761445");
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "4117365450"://Wanted
-      ReadyResource($player);
-      ReadyResource($player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "4282425335"://Top Target
-      $amount = CardIsUnique($target) ? 6 : 4;
-      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
-      AddDecisionQueue("PREPENDLASTRESULT", $player, "THEIRCHAR-0,", 1);
-      AddDecisionQueue("PREPENDLASTRESULT", $player, "MYCHAR-0,", 1);
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a card to restore ".$amount, 1);
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
-      AddDecisionQueue("MZOP", $player, "RESTORE,".$amount, 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "3074091930"://Rich Reward
-      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY");
-      AddDecisionQueue("OP", $player, "MZTONORMALINDICES");
-      AddDecisionQueue("PREPENDLASTRESULT", $player, "3-", 1);
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose up to 2 units to give experience");
-      AddDecisionQueue("MULTICHOOSEUNIT", $player, "<-", 1);
-      AddDecisionQueue("SPECIFICCARD", $player, "MULTIGIVEEXPERIENCE", 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "1780014071"://Public Enemy
-      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a unit to give a shield");
-      AddDecisionQueue("CHOOSEMULTIZONE", $player, "<-", 1);
-      AddDecisionQueue("MZOP", $player, "ADDSHIELD", 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "6135081953"://Doctor Evazan
-      for($i=0; $i<12; ++$i) {
-        ReadyResource($player);
-        checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      }
-      break;
-    case "6420322033"://Enticing Reward
-      AddDecisionQueue("FINDINDICES", $player, "DECKTOPXREMOVE," . 10);
-      AddDecisionQueue("SETDQVAR", $player, "0", 1);
-      AddDecisionQueue("FILTER", $player, "LastResult-exclude-definedType-Unit", 1);
-      AddDecisionQueue("MAYCHOOSECARD", $player, "<-", 1);
-      AddDecisionQueue("ADDHAND", $player, "-", 1);
-      AddDecisionQueue("REVEALCARDS", $player, "-", 1);
-      AddDecisionQueue("OP", $player, "REMOVECARD");
-      AddDecisionQueue("SETDQVAR", $player, "0", 1);
-      AddDecisionQueue("FILTER", $player, "LastResult-exclude-definedType-Unit", 1);
-      AddDecisionQueue("MAYCHOOSECARD", $player, "<-", 1);
-      AddDecisionQueue("ADDHAND", $player, "-", 1);
-      AddDecisionQueue("REVEALCARDS", $player, "-", 1);
-      AddDecisionQueue("OP", $player, "REMOVECARD");
-      AddDecisionQueue("ALLRANDOMBOTTOM", $player, "DECK");
-      if(!CardIsUnique($target)) PummelHit($player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "9503028597"://Clone Deserter
-    case "9108611319"://Cartel Turncoat
-    case "6878039039"://Hylobon Enforcer
-      Draw($player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "8679638018"://Wanted Insurgents
-      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a unit to deal 2 damage to");
-      AddDecisionQueue("CHOOSEMULTIZONE", $player, "<-", 1);
-      AddDecisionQueue("MZOP", $player, "DEALDAMAGE,2", 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "3503780024"://Outlaw Corona
-      AddTopDeckAsResource($player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "6947306017"://Fugitive Wookie
-      AddDecisionQueue("MULTIZONEINDICES", $player, "THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a card to exhaust");
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
-      AddDecisionQueue("MZOP", $player, "REST", 1);
-      break;
-    case "0252207505"://Synara San
-      DealDamageAsync($player, 5, "DAMAGE", "0252207505");
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "2965702252"://Unlicensed Headhunter
-      Restore(5, $player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    // case "7270736993"://Unrefusable Offer
-    //   AddLayer("TRIGGER", $player, "7270736993", $target);//Passing the cardID of the bountied unit as $target in order to search for it from discard
-    //   checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-    //   break;
-    case "9642863632"://Bounty Hunter's Quarry
-      global $CS_AfterPlayedBy;
-      $amount = CardIsUnique($target) ? 10 : 5;
-      $deck = &GetDeck($player);
-      if(count($deck)/DeckPieces() < $amount) $amount = count($deck)/DeckPieces();
-      AddDecisionQueue("FINDINDICES", $player, "DECKTOPXREMOVE," . $amount);
-      AddDecisionQueue("SETDQVAR", $player, "0", 1);
-      AddDecisionQueue("FILTER", $player, "LastResult-include-maxCost-3", 1);
-      AddDecisionQueue("FILTER", $player, "LastResult-include-definedType-Unit", 1);
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a card to play");
-      AddDecisionQueue("CHOOSECARD", $player, "<-", 1);
-      AddDecisionQueue("SETDQVAR", $player, "1");
-      AddDecisionQueue("OP", $player, "REMOVECARD");
-      AddDecisionQueue("ALLRANDOMBOTTOM", $player, "DECK");
-      AddDecisionQueue("PASSPARAMETER", $player, "{1}");
-      AddDecisionQueue("ADDCURRENTEFFECT", $player, "9642863632", 1);
-      AddDecisionQueue("PASSPARAMETER", $player, "9642863632", 1);
-      AddDecisionQueue("SETCLASSSTATE", $player, $CS_AfterPlayedBy, 1);
-      AddDecisionQueue("PASSPARAMETER", $player, "{1}", 1);
-      AddDecisionQueue("OP", $player, "PLAYCARD,DECK", 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "0807120264"://Death Mark
-      Draw($player);
-      Draw($player);
-      // checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "2151430798."://Guavian Antagonizer
-      Draw($player);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "0474909987"://Val
-      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a unit to deal 3 damage to");
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
-      AddDecisionQueue("MZOP", $player, "DEALDAMAGE,3", 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    case "7642980906"://Stolen Landspeeder
-      AddDecisionQueue("MULTIZONEINDICES", $player, "MYDISCARD:cardID=" . "7642980906");
-      AddDecisionQueue("SETDQCONTEXT", $player, "Click the Stolen Landspeeder to play it for free.", 1);
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
-      AddDecisionQueue("ADDCURRENTEFFECT", $player, "7642980906", 1);//Cost discount and experience adding.
-      AddDecisionQueue("MZOP", $player, "PLAYCARD", 1);
-      AddDecisionQueue("REMOVECURRENTEFFECT", $player, "7642980906");
-      break;
-    case "7270736993"://Unrefusable Offer
-      //There's in theory a minor bug with this implementation: if there's a second copy of the bountied unit in the discard
-      //it can be played even if the original unit is somehow removed from the discard before this trigger resolves.
-      //I can't think of a way to prevent this without adding functionality to track a specific card between zones.
-      global $CS_AfterPlayedBy;
-      AddDecisionQueue("YESNO", $player, "if you want to play " . CardLink($target, $target) . " for free off of " . CardLink("7270736993", "7270736993"));
-      AddDecisionQueue("NOPASS", $player, "-");
-      AddDecisionQueue("MULTIZONEINDICES", $player, "THEIRDISCARD:cardID=" . $target . ";maxCount=1", 1);
-      AddDecisionQueue("SETDQVAR", $player, "0", 1);
-      AddDecisionQueue("PASSPARAMETER", $player, "7270736993", 1);
-      AddDecisionQueue("SETCLASSSTATE", $player, $CS_AfterPlayedBy, 1);
-      AddDecisionQueue("ADDCURRENTEFFECT", $player, "7270736993", 1);
-      AddDecisionQueue("PASSPARAMETER", $player, "{0}", 1);
-      AddDecisionQueue("MZOP", $player, "PLAYCARD", 1);
-      checkAndHandleBoss($player, $parameter, $target, $additionalCosts);
-      break;
-    // End Bounties Section
     case "724979d608"://Cad Bane Unit
       $cadIndex = SearchAlliesForCard($player, "724979d608");
       $otherPlayer = ($player == 1 ? 2 : 1);
@@ -871,18 +698,254 @@ function ProcessTrigger($player, $parameter, $uniqueID, $additionalCosts, $targe
       AddDecisionQueue("MZOP", $player, "READY", 1);
       AddDecisionQueue("ADDMZUSES", $player, "-1", 1);
       break;
-    default: break;
+    case "8687233791"://Punishing One
+      $thisAlly = new Ally("MYALLY-" . $target, $player);
+      AddDecisionQueue("YESNO", $player, "if you want to ready " . CardLink("", $thisAlly->CardID()));
+      AddDecisionQueue("NOPASS", $player, "-");
+      AddDecisionQueue("PASSPARAMETER", $player, "MYALLY-" . $target, 1);
+      AddDecisionQueue("MZOP", $player, "READY", 1);
+      AddDecisionQueue("ADDMZUSES", $player, "-1", 1);
+      break;
+    default: handleBountyTriggers($player, $parameter, $uniqueID, $additionalCosts, $target);
   }
 }
 
-function checkAndHandleBoss($player,$cardID, $bountyUnit, $skipBossk) {
-  if($skipBossk) return;
+function handleBountyTriggers($player, $parameter, $uniqueID, $additionalCosts, $target="-") {
+  $isBossk = $additionalCosts == true;
+
+  switch($parameter) {
+    //Begin Bounties Section
+    case "1090660242-2"://The Client
+      Restore(5, $player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "0622803599-2"://Jabba the Hutt
+      AddCurrentTurnEffect("0622803599-3", $player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "f928681d36-2"://Jabba the Hutt Leader Unit
+      AddCurrentTurnEffect("f928681d36-3", $player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "2178538979"://Price on Your Head
+      AddTopDeckAsResource($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "2740761445"://Guild Target
+      $opponent = $player == 1 ? 2 : 1;
+      $damage = CardIsUnique($target) ? 3 : 2;
+      DealDamageAsync($opponent, $damage, "DAMAGE", "2740761445");
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "4117365450"://Wanted
+      ReadyResource($player);
+      ReadyResource($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "4282425335"://Top Target
+      $amount = CardIsUnique($target) ? 6 : 4;
+      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
+      AddDecisionQueue("PREPENDLASTRESULT", $player, "THEIRCHAR-0,", 1);
+      AddDecisionQueue("PREPENDLASTRESULT", $player, "MYCHAR-0,", 1);
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a card to restore ".$amount, 1);
+      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
+      AddDecisionQueue("MZOP", $player, "RESTORE,".$amount, 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "3074091930"://Rich Reward
+      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY");
+      AddDecisionQueue("OP", $player, "MZTONORMALINDICES");
+      AddDecisionQueue("PREPENDLASTRESULT", $player, "3-", 1);
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose up to 2 units to give experience");
+      AddDecisionQueue("MULTICHOOSEUNIT", $player, "<-", 1);
+      AddDecisionQueue("SPECIFICCARD", $player, "MULTIGIVEEXPERIENCE", 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "1780014071"://Public Enemy
+      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a unit to give a shield");
+      AddDecisionQueue("CHOOSEMULTIZONE", $player, "<-", 1);
+      AddDecisionQueue("MZOP", $player, "ADDSHIELD", 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "6135081953"://Doctor Evazan
+      for($i=0; $i<12; ++$i) {
+        ReadyResource($player);
+        if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      }
+      break;
+    case "6420322033"://Enticing Reward
+      AddDecisionQueue("FINDINDICES", $player, "DECKTOPXREMOVE," . 10);
+      AddDecisionQueue("SETDQVAR", $player, "0", 1);
+      AddDecisionQueue("FILTER", $player, "LastResult-exclude-definedType-Unit", 1);
+      AddDecisionQueue("MAYCHOOSECARD", $player, "<-", 1);
+      AddDecisionQueue("ADDHAND", $player, "-", 1);
+      AddDecisionQueue("REVEALCARDS", $player, "-", 1);
+      AddDecisionQueue("OP", $player, "REMOVECARD");
+      AddDecisionQueue("SETDQVAR", $player, "0", 1);
+      AddDecisionQueue("FILTER", $player, "LastResult-exclude-definedType-Unit", 1);
+      AddDecisionQueue("MAYCHOOSECARD", $player, "<-", 1);
+      AddDecisionQueue("ADDHAND", $player, "-", 1);
+      AddDecisionQueue("REVEALCARDS", $player, "-", 1);
+      AddDecisionQueue("OP", $player, "REMOVECARD");
+      AddDecisionQueue("ALLRANDOMBOTTOM", $player, "DECK");
+      if(!CardIsUnique($target)) PummelHit($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "9503028597"://Clone Deserter
+    case "9108611319"://Cartel Turncoat
+    case "6878039039"://Hylobon Enforcer
+      Draw($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "8679638018"://Wanted Insurgents
+      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a unit to deal 2 damage to");
+      AddDecisionQueue("CHOOSEMULTIZONE", $player, "<-", 1);
+      AddDecisionQueue("MZOP", $player, "DEALDAMAGE,2", 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "3503780024"://Outlaw Corona
+      AddTopDeckAsResource($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "6947306017"://Fugitive Wookie
+      AddDecisionQueue("MULTIZONEINDICES", $player, "THEIRALLY");
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a card to exhaust");
+      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
+      AddDecisionQueue("MZOP", $player, "REST", 1);
+      break;
+    case "0252207505"://Synara San
+      DealDamageAsync($player, 5, "DAMAGE", "0252207505");
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "2965702252"://Unlicensed Headhunter
+      Restore(5, $player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    // case "7270736993"://Unrefusable Offer
+      //   AddLayer("TRIGGER", $player, "7270736993", $target);//Passing the cardID of the bountied unit as $target in order to search for it from discard
+      //   if(!$isBossk) {
+      //   checkAndHandleBoss($player, $parameter, $target);
+      // }
+      //   break;
+    case "9642863632"://Bounty Hunter's Quarry
+      global $CS_AfterPlayedBy;
+      $amount = CardIsUnique($target) ? 10 : 5;
+      $deck = &GetDeck($player);
+      if(count($deck)/DeckPieces() < $amount) $amount = count($deck)/DeckPieces();
+      AddDecisionQueue("FINDINDICES", $player, "DECKTOPXREMOVE," . $amount);
+      AddDecisionQueue("SETDQVAR", $player, "0", 1);
+      AddDecisionQueue("FILTER", $player, "LastResult-include-maxCost-3", 1);
+      AddDecisionQueue("FILTER", $player, "LastResult-include-definedType-Unit", 1);
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a card to play");
+      AddDecisionQueue("CHOOSECARD", $player, "<-", 1);
+      AddDecisionQueue("SETDQVAR", $player, "1");
+      AddDecisionQueue("OP", $player, "REMOVECARD");
+      AddDecisionQueue("ALLRANDOMBOTTOM", $player, "DECK");
+      AddDecisionQueue("PASSPARAMETER", $player, "{1}");
+      AddDecisionQueue("ADDCURRENTEFFECT", $player, "9642863632", 1);
+      AddDecisionQueue("PASSPARAMETER", $player, "9642863632", 1);
+      AddDecisionQueue("SETCLASSSTATE", $player, $CS_AfterPlayedBy, 1);
+      AddDecisionQueue("PASSPARAMETER", $player, "{1}", 1);
+      AddDecisionQueue("OP", $player, "PLAYCARD,DECK", 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "0807120264"://Death Mark
+      Draw($player);
+      Draw($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "2151430798."://Guavian Antagonizer
+      Draw($player);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "0474909987"://Val
+      AddDecisionQueue("MULTIZONEINDICES", $player, "MYALLY&THEIRALLY");
+      AddDecisionQueue("SETDQCONTEXT", $player, "Choose a unit to deal 3 damage to");
+      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
+      AddDecisionQueue("MZOP", $player, "DEALDAMAGE,3", 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    case "7642980906"://Stolen Landspeeder
+      AddDecisionQueue("MULTIZONEINDICES", $player, "MYDISCARD:cardID=" . "7642980906");
+      AddDecisionQueue("SETDQCONTEXT", $player, "Click the Stolen Landspeeder to play it for free.", 1);
+      AddDecisionQueue("MAYCHOOSEMULTIZONE", $player, "<-", 1);
+      AddDecisionQueue("ADDCURRENTEFFECT", $player, "7642980906", 1);//Cost discount and experience adding.
+      AddDecisionQueue("MZOP", $player, "PLAYCARD", 1);
+      AddDecisionQueue("REMOVECURRENTEFFECT", $player, "7642980906");
+      break;
+    case "7270736993"://Unrefusable Offer
+      //There's in theory a minor bug with this implementation: if there's a second copy of the bountied unit in the discard
+      //it can be played even if the original unit is somehow removed from the discard before this trigger resolves.
+      //I can't think of a way to prevent this without adding functionality to track a specific card between zones.
+      global $CS_AfterPlayedBy;
+      AddDecisionQueue("YESNO", $player, "if you want to play " . CardLink($target, $target) . " for free off of " . CardLink("7270736993", "7270736993"));
+      AddDecisionQueue("NOPASS", $player, "-");
+      AddDecisionQueue("MULTIZONEINDICES", $player, "THEIRDISCARD:cardID=" . $target . ";maxCount=1", 1);
+      AddDecisionQueue("SETDQVAR", $player, "0", 1);
+      AddDecisionQueue("PASSPARAMETER", $player, "7270736993", 1);
+      AddDecisionQueue("SETCLASSSTATE", $player, $CS_AfterPlayedBy, 1);
+      AddDecisionQueue("ADDCURRENTEFFECT", $player, "7270736993", 1);
+      AddDecisionQueue("PASSPARAMETER", $player, "{0}", 1);
+      AddDecisionQueue("MZOP", $player, "PLAYCARD", 1);
+      if(!$isBossk) {
+        checkAndHandleBoss($player, $parameter, $target);
+      }
+      break;
+    // End Bounties Section
+  }
+}
+
+function checkAndHandleBoss($player, $cardID, $bountyUnit) {
+  WriteLog("Check Bossk");
   $opponent = $player == 1 ? 2 : 1;
   $bosskIndex = SearchAlliesForCard($player, "d2bbda6982"); 
   if($bosskIndex != "") {
     $bossk = new Ally("MYALLY-" . $bosskIndex, $player);
     if($bossk->NumUses() > 0) {
-      AddDecisionQueue("NOALLYUNIQUEIDPASS", $player, $bossk->UniqueID());
+      WriteLog("Use Bossk?");
+      AddDecisionQueue("NOALLYUNIQUEIDPASS", $player, $bossk->UniqueID(), 1);
       AddDecisionQueue("PASSPARAMETER", $player, $cardID, 1);
       AddDecisionQueue("SETDQVAR", $player, 0, 1);
       AddDecisionQueue("SETDQCONTEXT", $player, "Do you want to collect the bounty for <0> again with Bossk?", 1);
@@ -890,7 +953,7 @@ function checkAndHandleBoss($player,$cardID, $bountyUnit, $skipBossk) {
       AddDecisionQueue("NOPASS", $player, "-", 1);
       AddDecisionQueue("PASSPARAMETER", $player, "MYALLY-" . $bosskIndex, 1);
       AddDecisionQueue("ADDMZUSES", $player, "-1", 1);
-      AddDecisionQueue("BOSSKBOUNTY", $opponent, $cardID . "," . $bountyUnit, 1);
+      AddDecisionQueue("BOSSKBOUNTY", $player, $cardID . "," . $bountyUnit, 1);
     }
   } 
 }

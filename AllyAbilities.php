@@ -539,11 +539,7 @@ function AllyDestroyedAbility($player, $index, $fromCombat)
       case "8687233791"://Punishing One
         $thisAlly = new Ally("MYALLY-" . $i, $otherPlayer);
         if($destroyedAlly->IsUpgraded() && $thisAlly->IsExhausted() && $thisAlly->NumUses() > 0) {
-          AddDecisionQueue("YESNO", $otherPlayer, "if you want to ready " . CardLink("", $thisAlly->CardID()));
-          AddDecisionQueue("NOPASS", $otherPlayer, "-");
-          AddDecisionQueue("PASSPARAMETER", $otherPlayer, "MYALLY-" . $i, 1);
-          AddDecisionQueue("MZOP", $otherPlayer, "READY", 1);
-          AddDecisionQueue("ADDMZUSES", $otherPlayer, "-1", 1);
+          AddLayer("TRIGGER", $otherPlayer, "8687233791", $i, append:true);
         }
         break;
       default: break;
