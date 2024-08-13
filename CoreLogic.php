@@ -1153,7 +1153,7 @@ function HasKeyword($cardID, $keyword, $player="", $index=-1){
         RaidAmount($cardID, $player, $index, true) > 0 ||
         HasGrit($cardID, $player, $index) ||
         RestoreAmount($cardID, $player, $index) > 0 ||
-        CollectBounty($player, $index, $cardID, true) > 0 ||
+        HasBounty($player, $index, $cardID) > 0 ||
         HasOverwhelm($cardID, $player, $index) ||
         HasSaboteur($cardID, $player, $index) ||
         HasShielded($cardID, $player, $index) ||

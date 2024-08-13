@@ -434,6 +434,39 @@ function HasAmbush($cardID, $player, $index, $from)
   }
 }
 
+function HasBounty($player, $index, $cardID): bool {
+  switch($cardID) {
+    case "1090660242-2"://The Client
+    case "0622803599-1"://Jabba the Hut (Leader)
+    case "f928681d36-2"://Jabba the Hut (Leader Unit)
+    case "2178538979"://Price on Your Head
+    case "2740761445"://Guild Target
+    case "4117365450"://Wanted
+    case "4282425335"://Top Target
+    case "3074091930"://Rich Reward
+    case "1780014071"://Public Enemy
+    case "6135081953"://Doctor Evazan
+    case "6420322033"://Enticing Reward
+    case "9503028597"://Clone Deserter
+    case "9108611319"://Cartel Turncoat
+    case "6878039039"://Hylobon Enforcer
+    case "8679638018"://Wanted Insurgents
+    case "3503780024"://Outlaw Corona
+    case "6947306017"://Fugitive Wookie
+    case "7270736993"://Unrefusable Offer
+    case "9642863632"://Bounty Hunter's Quarry
+    case "2151430798."://Guavian Antagonizer
+    case "0807120264"://Death Mark
+    case "0474909987"://Val
+      return true;
+    case "0252207505"://Synara San
+    case "2965702252"://Unlicensed Headhunter
+      $ally = new Ally("MYALLY-" . $index, $player);
+      return $ally->IsExhausted();
+    default: return false;
+  }
+}
+
 function HasShielded($cardID, $player, $index)
 {
   switch($cardID)

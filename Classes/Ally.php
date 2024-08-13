@@ -475,8 +475,8 @@ class Ally {
     return count($upgrades);
   }
 
-  function HasBounty() {
-    return CollectBounties($this->PlayerID(), $this->Index(), reportMode:true) > 0;
+  function HasBounty(): bool {
+    return HasBounties($this->PlayerID(), $this->Index()) > 0;
   }
 
 }

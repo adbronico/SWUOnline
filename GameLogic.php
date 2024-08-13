@@ -1058,7 +1058,15 @@ function DecisionQueueStaticEffect($phase, $player, $parameter, $lastResult)
       $paramArr = explode(",", $parameter);
       $bounty = $paramArr[0];
       $bountyUnit = $paramArr[1];
-      CollectBounty($player, -1, $bounty, reportMode:false, bountyUnitOverride:$bountyUnit);
+      $skipBossk = false;
+      CollectBounty($player, -1, $bounty, skipBossk:false, bountyUnitOverride:$bountyUnit);
+      return $lastResult;
+    case "BOSSKBOUNTY":
+      $paramArr = explode(",", $parameter);
+      $bounty = $paramArr[0];
+      $bountyUnit = $paramArr[1];
+      $skipBossk = false;
+      CollectBounty($player, -1, $bounty, skipBossk:true, bountyUnitOverride:$bountyUnit);
       return $lastResult;
     case "ARCANECHOSEN":
       if($lastResult > 0) {

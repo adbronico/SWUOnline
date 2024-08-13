@@ -166,7 +166,9 @@ function DestroyAlly($player, $index, $skipDestroy = false, $fromCombat = false)
   $discardPileModifier = "-";
   if(!$skipDestroy) {
     AllyDestroyedAbility($player, $index, $fromCombat);
-    CollectBounties($player, $index);
+    if(HasBounties($player, $index)) {
+      CollectBounties($player, $index);
+    }
     IncrementClassState($player, $CS_NumAlliesDestroyed);
   }
   IncrementClassState($player, $CS_NumLeftPlay);
@@ -549,202 +551,29 @@ function AllyDestroyedAbility($player, $index, $fromCombat)
   }
 }
 
-function CollectBounty($player, $index, $cardID, $reportMode=false, $bountyUnitOverride="-") {
+function CollectBounty($player, $index, $cardID, $skipBossk=false, $bountyUnitOverride="-") {
   $ally = new Ally("MYALLY-" . $index, $player);
   $bountyUnit = $bountyUnitOverride == "-" ? $ally->CardID() : $bountyUnitOverride;
   $opponent = $player == 1 ? 2 : 1;
   $numBounties = 0;
-  switch($cardID) {
-    case "1090660242-2"://The Client
-      ++$numBounties;
-      if($reportMode) break;
-      Restore(5, $opponent);
-      break;
-    case "0622803599-2"://Jabba the Hutt
-      ++$numBounties;
-      if($reportMode) break;
-      AddCurrentTurnEffect("0622803599-3", $opponent);
-      break;
-    case "f928681d36-2"://Jabba the Hutt Leader Unit
-      ++$numBounties;
-      if($reportMode) break;
-      AddCurrentTurnEffect("f928681d36-3", $opponent);
-      break;
-    case "2178538979"://Price on Your Head
-      ++$numBounties;
-      if($reportMode) break;
-      AddTopDeckAsResource($opponent);
-      break;
-    case "2740761445"://Guild Target
-      ++$numBounties;
-      if($reportMode) break;
-      $damage = CardIsUnique($bountyUnit) ? 3 : 2;
-      DealDamageAsync($player, $damage, "DAMAGE", "2740761445");
-      break;
-    case "4117365450"://Wanted
-      ++$numBounties;
-      if($reportMode) break;
-      ReadyResource($opponent);
-      ReadyResource($opponent);
-      break;
-    case "4282425335"://Top Target
-      ++$numBounties;
-      if($reportMode) break;
-      $amount = CardIsUnique($bountyUnit) ? 6 : 4;
-      AddDecisionQueue("MULTIZONEINDICES", $opponent, "MYALLY&THEIRALLY");
-      AddDecisionQueue("PREPENDLASTRESULT", $opponent, "THEIRCHAR-0,", 1);
-      AddDecisionQueue("PREPENDLASTRESULT", $opponent, "MYCHAR-0,", 1);
-      AddDecisionQueue("SETDQCONTEXT", $opponent, "Choose a card to restore ".$amount, 1);
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $opponent, "<-", 1);
-      AddDecisionQueue("MZOP", $opponent, "RESTORE,".$amount, 1);
-      break;
-    case "3074091930"://Rich Reward
-      ++$numBounties;
-      if($reportMode) break;
-      AddDecisionQueue("MULTIZONEINDICES", $opponent, "MYALLY");
-      AddDecisionQueue("OP", $opponent, "MZTONORMALINDICES");
-      AddDecisionQueue("PREPENDLASTRESULT", $opponent, "3-", 1);
-      AddDecisionQueue("SETDQCONTEXT", $opponent, "Choose up to 2 units to give experience");
-      AddDecisionQueue("MULTICHOOSEUNIT", $opponent, "<-", 1);
-      AddDecisionQueue("SPECIFICCARD", $opponent, "MULTIGIVEEXPERIENCE", 1);
-      break;
-    case "1780014071"://Public Enemy
-      ++$numBounties;
-      if($reportMode) break;
-      AddDecisionQueue("MULTIZONEINDICES", $opponent, "MYALLY&THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $opponent, "Choose a unit to give a shield");
-      AddDecisionQueue("CHOOSEMULTIZONE", $opponent, "<-", 1);
-      AddDecisionQueue("MZOP", $opponent, "ADDSHIELD", 1);
-      break;
-    case "6135081953"://Doctor Evazan
-      ++$numBounties;
-      if($reportMode) break;
-      for($i=0; $i<12; ++$i) {
-        ReadyResource($opponent);
-      }
-      break;
-    case "6420322033"://Enticing Reward
-      ++$numBounties;
-      if($reportMode) break;
-      AddDecisionQueue("FINDINDICES", $opponent, "DECKTOPXREMOVE," . 10);
-      AddDecisionQueue("SETDQVAR", $opponent, "0", 1);
-      AddDecisionQueue("FILTER", $opponent, "LastResult-exclude-definedType-Unit", 1);
-      AddDecisionQueue("MAYCHOOSECARD", $opponent, "<-", 1);
-      AddDecisionQueue("ADDHAND", $opponent, "-", 1);
-      AddDecisionQueue("REVEALCARDS", $opponent, "-", 1);
-      AddDecisionQueue("OP", $opponent, "REMOVECARD");
-      AddDecisionQueue("SETDQVAR", $opponent, "0", 1);
-      AddDecisionQueue("FILTER", $opponent, "LastResult-exclude-definedType-Unit", 1);
-      AddDecisionQueue("MAYCHOOSECARD", $opponent, "<-", 1);
-      AddDecisionQueue("ADDHAND", $opponent, "-", 1);
-      AddDecisionQueue("REVEALCARDS", $opponent, "-", 1);
-      AddDecisionQueue("OP", $opponent, "REMOVECARD");
-      AddDecisionQueue("ALLRANDOMBOTTOM", $opponent, "DECK");
-      if(!CardIsUnique($bountyUnit)) PummelHit($opponent);
-      break;
-    case "9503028597"://Clone Deserter
-    case "9108611319"://Cartel Turncoat
-    case "6878039039"://Hylobon Enforcer
-      ++$numBounties;
-      if($reportMode) break;
-      Draw($opponent);
-      break;
-    case "8679638018"://Wanted Insurgents
-      ++$numBounties;
-      if($reportMode) break;
-      AddDecisionQueue("MULTIZONEINDICES", $opponent, "MYALLY&THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $opponent, "Choose a unit to deal 2 damage to");
-      AddDecisionQueue("CHOOSEMULTIZONE", $opponent, "<-", 1);
-      AddDecisionQueue("MZOP", $opponent, "DEALDAMAGE,2", 1);
-      break;
-    case "3503780024"://Outlaw Corona
-      ++$numBounties;
-      if($reportMode) break;
-      AddTopDeckAsResource($opponent);
-      break;
-    case "6947306017"://Fugitive Wookie
-      ++$numBounties;
-      if($reportMode) break;
-      AddDecisionQueue("MULTIZONEINDICES", $opponent, "THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $opponent, "Choose a card to exhaust");
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $opponent, "<-", 1);
-      AddDecisionQueue("MZOP", $opponent, "REST", 1);
-      break;
-    case "0252207505"://Synara San
-      if($bountyUnitOverride != "-" || $ally->IsExhausted()) {
-        ++$numBounties;
-        if($reportMode) break;
-        DealDamageAsync($player, 5, "DAMAGE", "0252207505");
-      }
-      break;
-    case "2965702252"://Unlicensed Headhunter
-      if($bountyUnitOverride != "-" || $ally->IsExhausted()) {
-        ++$numBounties;
-        if($reportMode) break;
-        Restore(5, $opponent);
-      }
-      break;
-    case "7642980906"://Stolen Landspeeder
-      ++$numBounties;
-      if($reportMode) break;
-      if($ally->Owner() == $opponent) AddLayer("TRIGGER", $opponent, "7642980906");
-      break;
-    case "7270736993"://Unrefusable Offer
-      ++$numBounties;
-      if($reportMode) break;
-      AddLayer("TRIGGER", $opponent, "7270736993", $bountyUnit);//Passing the cardID of the bountied unit as $target in order to search for it from discard
-      break;
-    case "9642863632"://Bounty Hunter's Quarry
-      ++$numBounties;
-      if($reportMode) break;
-      $amount = CardIsUnique($bountyUnit) ? 10 : 5;
-      $deck = &GetDeck($opponent);
-      if(count($deck)/DeckPieces() < $amount) $amount = count($deck)/DeckPieces();
-      AddLayer("TRIGGER", $opponent, "9642863632", target:$amount);
-      break;
-    case "0807120264"://Death Mark
-      ++$numBounties;
-      if($reportMode) break;
-      Draw($opponent);
-      Draw($opponent);
-      break;
-    case "2151430798."://Guavian Antagonizer
-      ++$numBounties;
-      if($reportMode) break;
-      Draw($opponent);
-      break;
-    case "0474909987"://Val
-      ++$numBounties;
-      if($reportMode) break;
-      AddDecisionQueue("MULTIZONEINDICES", $opponent, "MYALLY&THEIRALLY");
-      AddDecisionQueue("SETDQCONTEXT", $opponent, "Choose a unit to deal 3 damage to");
-      AddDecisionQueue("MAYCHOOSEMULTIZONE", $opponent, "<-", 1);
-      AddDecisionQueue("MZOP", $opponent, "DEALDAMAGE,3", 1);
-      break;
-    default: break;
+
+  if($cardID == "7642980906") {
+    if($ally->Owner() == $player) AddLayer("TRIGGER", $player, "7642980906");
+    return 1;
   }
-  if($numBounties > 0 && !$reportMode) {
-    $bosskIndex = SearchAlliesForCard($opponent, "d2bbda6982"); 
-    if($bosskIndex != "") {
-      $bossk = new Ally("MYALLY-" . $bosskIndex, $opponent);
-      if($bossk->NumUses() > 0) {
-        AddDecisionQueue("NOALLYUNIQUEIDPASS", $opponent, $bossk->UniqueID());
-        AddDecisionQueue("PASSPARAMETER", $opponent, $cardID, 1);
-        AddDecisionQueue("SETDQVAR", $opponent, 0, 1);
-        AddDecisionQueue("SETDQCONTEXT", $opponent, "Do you want to collect the bounty for <0> again with Bossk?", 1);
-        AddDecisionQueue("YESNO", $opponent, "-", 1);
-        AddDecisionQueue("NOPASS", $opponent, "-", 1);
-        AddDecisionQueue("PASSPARAMETER", $opponent, "MYALLY-" . $bosskIndex, 1);
-        AddDecisionQueue("ADDMZUSES", $opponent, "-1", 1);
-        AddDecisionQueue("COLLECTBOUNTY", $player, $cardID . "," . $bountyUnit, 1);
-      }
+
+  if($cardID == "0252207505" || $cardID == "2965702252") {// Synara San and Unlicensed Headhunter
+    if($bountyUnitOverride != "-" || $ally->IsExhausted()) {
+      AddLayer("TRIGGER", $opponent, $cardID, $bountyUnit, $skipBossk);
     }
+  } else {
+    AddLayer("TRIGGER", $opponent, $cardID, $bountyUnit, $skipBossk);
   }
   return $numBounties;
 }
 
 //Bounty abilities
-function CollectBounties($player, $index, $reportMode=false) {
+function CollectBounties($player, $index) {
   global $currentTurnEffects;
   $ally = new Ally("MYALLY-" . $index, $player);
   $opponent = $player == 1 ? 2 : 1;
@@ -753,15 +582,41 @@ function CollectBounties($player, $index, $reportMode=false) {
   for($i=0; $i<count($currentTurnEffects); $i+=CurrentTurnEffectPieces()) {
     if($currentTurnEffects[$i+1] != $player) continue;
     if($currentTurnEffects[$i+2] != $ally->UniqueID()) continue;
-    $numBounties += CollectBounty($player, $index, $currentTurnEffects[$i], $reportMode);
+    if(HasBounty($player, $index, $currentTurnEffects[$i])) {
+      $numBounties += CollectBounty($player, $index, $currentTurnEffects[$i]);
+    }
   }
   //Upgrade bounties
   $upgrades = $ally->GetUpgrades();
   for($i=0; $i<count($upgrades); ++$i)
   {
-    $numBounties += CollectBounty($player, $index, $upgrades[$i], $reportMode);
+    if(HasBounty($player, $index, $upgrades[$i])) {
+      $numBounties += CollectBounty($player, $index, $upgrades[$i]);
+    }
   }
-  $numBounties += CollectBounty($player, $index, $ally->CardID(), $reportMode);
+  if(HasBounty($player, $index, $ally->CardID())) {
+    $numBounties += CollectBounty($player, $index, $ally->CardID());
+  }
+  return $numBounties;
+}
+
+function HasBounties($player, $index) {
+  global $currentTurnEffects;
+  $ally = new Ally("MYALLY-" . $index, $player);
+  $numBounties = 0;
+  //Current turn effect bounties
+  for($i=0; $i<count($currentTurnEffects); $i+=CurrentTurnEffectPieces()) {
+    if($currentTurnEffects[$i+1] != $player) continue;
+    if($currentTurnEffects[$i+2] != $ally->UniqueID()) continue;
+    if(HasBounty($player, $index, $currentTurnEffects[$i])) $numBounties++;
+  }
+  //Upgrade bounties
+  $upgrades = $ally->GetUpgrades();
+  for($i=0; $i<count($upgrades); ++$i)
+  {
+    if(HasBounty($player, $index, $upgrades[$i])) $numBounties++;
+  }
+  if(HasBounty($player, $index, $ally->CardID())) $numBounties++;
   return $numBounties;
 }
 
